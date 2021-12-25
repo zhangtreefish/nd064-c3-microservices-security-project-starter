@@ -4,9 +4,9 @@ ENV["TERM"]="linux"
 Vagrant.configure("2") do |config|
 #test for Yi!
   # set up root access
-  config.ssh.username = 'root'
-  config.ssh.password = 'vagrant'
-  config.ssh.insert_key = 'true'
+  # config.ssh.username = 'root'
+  # config.ssh.password = 'vagrant'
+  # config.ssh.insert_key = 'true'
 
   NodeCount = 1
 
@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
       # install Docker
       zypper --non-interactive install docker #python3-docker-compose
       systemctl enable docker
-      usermod -G docker -a $USER
+      usermod -a -G docker vagrant
       systemctl restart docker
     SHELL
     end
