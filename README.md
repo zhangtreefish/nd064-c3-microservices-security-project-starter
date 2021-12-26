@@ -79,3 +79,50 @@ Number of key(s) added:        1
 Now try logging into the machine, with:   "ssh 'vagrant@192.168.56.4'"
 and check to make sure that only the key(s) you wanted were added.
 
+with commit  : on vagrant up: Vagrant insecure key detected. Vagrant will automatically replace
+    node1: this with a newly generated keypair for better security.
+    node1: 
+    node1: Inserting generated public key within guest...
+    node1: Removing insecure key from the guest if it's present...
+    node1: Key inserted! Disconnecting and reconnecting using new SSH key...
+
+(base) mommy@Mommys-iMac starter % ssh-copy-id -f -i ~/.ssh/id_rsa vagrant@192.168.56.4
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/Users/mommy/.ssh/id_rsa.pub"
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ECDSA key sent by the remote host is
+SHA256:Rr9Bve4s4Q92yePA+Nf8FK0etEYAvF9veDSe4TotXO0.
+Please contact your system administrator.
+Add correct host key in /Users/mommy/.ssh/known_hosts to get rid of this message.
+Offending ECDSA key in /Users/mommy/.ssh/known_hosts:1
+ECDSA host key for 192.168.56.4 has changed and you have requested strict checking.
+Host key verification failed.
+(base) mommy@Mommys-iMac starter % vi ~/.ssh/known_hosts 
+(base) mommy@Mommys-iMac starter % vi ~/.ssh/known_hosts
+(base) mommy@Mommys-iMac starter % ssh-copy-id -f -i ~/.ssh/id_rsa vagrant@192.168.56.4
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/Users/mommy/.ssh/id_rsa.pub"
+The authenticity of host '192.168.56.4 (192.168.56.4)' can't be established.
+ECDSA key fingerprint is SHA256:Rr9Bve4s4Q92yePA+Nf8FK0etEYAvF9veDSe4TotXO0.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Password: 
+Password: 
+
+Number of key(s) added:        1
+
+Now try logging into the machine, with:   "ssh 'vagrant@192.168.56.4'"
+and check to make sure that only the key(s) you wanted were added.
+
+(base) mommy@Mommys-iMac starter % ssh 'vagrant@192.168.56.4'
+Last failed login: Sun Dec 26 03:57:18 UTC 2021 from 192.168.56.1 on ssh:notty
+There was 1 failed login attempt since the last successful login.
+Have a lot of fun...
+vagrant@localhost:~> cat ~/.ssh/id_rsa
+
+vagrant@localhost:~> cat ~/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDBQ+ztMqfAc5TWUN45uXhAYKKvVFuA0Yp54GGYaqvzIE49GMZyDfblTk7ueHnDY4QBCInj1CajPS167WiHcSZomgjrEPssfWM8k2f6tY/8wp4e2Rr9LqQ9AISATO1UYD6uYqpc3rjv60JArMxsmygvI/RVpDOdXe1Jw8XDURFxiIriMFL8S5NOYzF+B4NH+3xvH1MRegEhvi4Qhu64yEIuyqQUM7TtPLqesXIhVt6rkCLbzi5lE6tOL7PfL9Mf7p4qmGABZFICif/ehzPidHxihoYOBKdSNzwhzCLdUDxAa2vqTFJ6hq77vRkFBC4GV+J2GKZC/zLT1JaxRUpWCJT vagrant
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFgA8ieKpxlw5rVqInxdIAdoAuXnimtSCmihKkYfxSqT0ymHgkM4vtxNqmuw8/BEyMU4+iHQZt1U5t9kNWmNXh1nPmvWZvZKPpqogTAKcf4dY6CWLpRLlwQyHXzIVIORubG6pCrdCWze+1yFDz9lIAWP6mbXMlTeHwv+4Pl5huVbedjtLQCKJsvgkpOO0ObSbN5YzUFueddIayX4mu5bNOaIKE1HYaZ3uhNdmAN1MRA/i/w3b7hwgPZOjs4muWgrhVKy8m8IKxfxlYdeomlXPiB2aovdZnqfN23L7+k+t4/ms+l6w5MkFi1Fg5wXL+QaHnKDx76lsZcjLxUan0+ZmJ mommy@Mommys-iMac.local
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFgA8ieKpxlw5rVqInxdIAdoAuXnimtSCmihKkYfxSqT0ymHgkM4vtxNqmuw8/BEyMU4+iHQZt1U5t9kNWmNXh1nPmvWZvZKPpqogTAKcf4dY6CWLpRLlwQyHXzIVIORubG6pCrdCWze+1yFDz9lIAWP6mbXMlTeHwv+4Pl5huVbedjtLQCKJsvgkpOO0ObSbN5YzUFueddIayX4mu5bNOaIKE1HYaZ3uhNdmAN1MRA/i/w3b7hwgPZOjs4muWgrhVKy8m8IKxfxlYdeomlXPiB2aovdZnqfN23L7+k+t4/ms+l6w5MkFi1Fg5wXL+QaHnKDx76lsZcjLxUan0+ZmJ mommy@Mommys-iMac.local
