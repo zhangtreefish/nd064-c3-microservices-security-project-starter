@@ -16,23 +16,29 @@ Vagrant.configure("2") do |config|
       # set base image for the vagrant box
       config.vm.box = "opensuse/Leap-15.2.x86_64"
 
+      # added by me:
+      config.ssh.insert_key = 'true'
+      config.ssh.private_key_path = File.expand_path('~/.ssh/id_rsa')
+      config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/root/.ssh/me.pub"
+      config.vm.provision "shell", inline: <<-SHELL
+        cat /root/.ssh/me.pub >> /root/.ssh/authorized_keys
+      SHELL
+
       # set the static IP for the vagrant box
       node.vm.network "private_network", ip: "192.168.50.10#{i}"
       # configure the parameters for VirtualBox provider
       node.vm.provider "virtualbox" do |v|
-        v.name = "node#{i}"
+        v.name = "udacitynode#{i}"
         v.memory = 2048
         v.cpus = 2
+        # copy the private_key for default VM started with virtualbox provider to user vagrant if using vagrant
+        # cp -p /vagrant/.vagrant/machines/node1/virtualbox/private_key /home/vagrant/.ssh/id_rsa
       end
 
     config.vm.provision "shell", inline: <<-SHELL
       sudo zypper --non-interactive install apparmor-parser
-      # install Docker
-      zypper --non-interactive install docker #python3-docker-compose
-      systemctl enable docker
-      usermod -G docker -a $USER
-      systemctl restart docker
     SHELL
+    config.vm.provision "shell", path: "bootstrap.sh"
     end
   end
 end
