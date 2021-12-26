@@ -7,8 +7,8 @@ nodes:
   - controlplane
   - etcd
   - worker
-  hostname_override: node1
-  user: root
+  hostname_override: vanode1
+  user: vagrant
   docker_socket: /var/run/docker.sock
   ssh_key: ""
   ssh_key_path: ~/.ssh/id_rsa
