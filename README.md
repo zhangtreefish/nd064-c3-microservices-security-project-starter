@@ -17,3 +17,26 @@ No stress, you have tools and security incident response knowledge to respond ;)
 ### Project Instructions
 
 Follow the steps/instructions in the Udacity classroom to complete and submit the project.
+SSH for RKE:
+https://rancher.com/docs/rke/latest/en/config-options/
+`ssh_agent_auth: true`
+```
+$ eval "$(ssh-agent -s)"
+Agent pid 3975
+$ ssh-add /home/user/.ssh/id_rsa
+Enter passphrase for /home/user/.ssh/id_rsa:
+Identity added: /home/user/.ssh/id_rsa (/home/user/.ssh/id_rsa)
+$ echo $SSH_AUTH_SOCK
+/tmp/ssh-118TMqxrXsEx/agent.3974
+```
+https://www.cyberciti.biz/faq/how-to-use-ssh-agent-for-authentication-on-linux-unix/
+ssh-add -l
+ssh-add -L
+man ssh-add
+
+https://stackoverflow.com/questions/32314257/vagrant-up-failing-because-the-name-already-exists
+ find **/node1
+cd "/Users/mommy/VirtualBox VMs"
+find . -type f -name "Leap*" -print
+find . -type f -name "Leap*" -delete
+rm -r -f Leap-15.2_16*

@@ -161,7 +161,7 @@ system_images:
   aci_opflex_server_container: noiro/opflex-server:5.1.1.0.1ae238a
 ssh_key_path: ~/.ssh/id_rsa
 ssh_cert_path: ""
-ssh_agent_auth: false
+ssh_agent_auth: true
 authorization:
   mode: rbac
   options: {}
