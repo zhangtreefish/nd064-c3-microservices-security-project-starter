@@ -5,8 +5,8 @@ Vagrant.configure("2") do |config|
 #test for Yi!
   # set up root access
   # config.ssh.username = 'root'
-  # config.ssh.password = 'vagrant'
-  # config.ssh.insert_key = 'true'
+  config.ssh.password = 'vagrant'
+  config.ssh.insert_key = 'true'
 
   NodeCount = 1
 
@@ -15,9 +15,9 @@ Vagrant.configure("2") do |config|
     config.vm.define "node#{i}" do |node|
       # set base image for the vagrant box
       config.vm.box = "opensuse/Leap-15.2.x86_64"
-      config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-      config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
-      config.ssh.insert_key = 'false'
+      #config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
+      #config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
+      #config.ssh.insert_key = 'false'
       
       # set the static IP for the vagrant box
       node.vm.network "private_network", ip: "192.168.50.10#{i}"
