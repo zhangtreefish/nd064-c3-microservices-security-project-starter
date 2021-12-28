@@ -142,3 +142,5 @@ https://github.com/SUSE-Rancher-Community/local-setup-of-rancher-with-rke
 ssh-keygen -t rsa -b 2048 //en saved in /Users/mommy/.ssh/nd064_rsa.
 Your public key has been saved in /Users/mommy/.ssh/nd064_rsa.pub.
 sudo ssh-copy-id -i ~/.ssh/nd064_rsa vagrant@192.168.50.101
+config.ssh.private_key_path 
+https://stackoverflow.com/questions/61837844/vagrant-custom-ssh-key-authentication-failure
