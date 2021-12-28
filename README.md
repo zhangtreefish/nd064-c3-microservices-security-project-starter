@@ -144,3 +144,26 @@ Your public key has been saved in /Users/mommy/.ssh/nd064_rsa.pub.
 sudo ssh-copy-id -i ~/.ssh/nd064_rsa vagrant@192.168.50.101
 config.ssh.private_key_path 
 https://stackoverflow.com/questions/61837844/vagrant-custom-ssh-key-authentication-failure
+with the above fix: 
+(base) mommy@Mommys-iMac starter % ssh vagrant@192.168.56.4
+The authenticity of host '192.168.56.4 (192.168.56.4)' can't be established.
+ECDSA key fingerprint is SHA256:S3fJNYuHIcPFIzYHrW0sTzwWqccEsdRlpUVWLM8vi2k.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.56.4' (ECDSA) to the list of known hosts.
+Have a lot of fun...
+vagrant@localhost:~> ls ~/.ssh
+authorized_keys  config  id_rsa
+
+but rke fails:
+Failed to set up SSH tunneling for host [192.168.56.4]: Can't retrieve Docker Info: error during connect: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/info": Unable to access node with address [192.168.56.4:22] using SSH. Please check if you are able to SSH to the node using the specified SSH Private Key and if you have configured the correct SSH username. Error: ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain 
+WARN[0000] Removing host [192.168.56.4] from node lists , see screenshot "AuthenticationFailure.jpeg".
+see https://rancher.com/docs/rke/latest/en/troubleshooting/ssh-connectivity-errors/
+and https://knowledge.udacity.com/questions/753741 : 
+
+
+rke@localhost:~> ls -lart /home
+total 16
+drwxr-xr-x  8 vagrant vagrant 4096 Dec 26 15:12 vagrant
+drwxr-xr-x 24 root    root    4096 Dec 26 15:14 ..
+drwxr-xr-x  4 root    root    4096 Dec 28 23:25 .
+drwxr-xr-x  3 rke     root    4096 Dec 28 23:31 rke

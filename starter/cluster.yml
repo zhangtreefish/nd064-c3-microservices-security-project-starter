@@ -1,8 +1,8 @@
 # mainatiner: nick.reva@snap.com
 nodes:
-- address: 192.168.50.101
+- address: 192.168.56.4
   port: "22"
-  internal_address: 192.168.50.101
+  internal_address: 192.168.56.4
   role:
   - controlplane
   - etcd
@@ -11,7 +11,7 @@ nodes:
   user: vagrant
   docker_socket: /var/run/docker.sock
   ssh_key: ""
-  ssh_key_path: ~/.ssh/id_rsa
+  ssh_key_path: /home/vagrant/.ssh/id_rsa
   ssh_cert: ""
   ssh_cert_path: ""
   labels: {}

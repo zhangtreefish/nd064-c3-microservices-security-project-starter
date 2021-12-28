@@ -12,20 +12,34 @@ Vagrant.configure("2") do |config|
 
   # configure Kubernetes Nodes
   (1..NodeCount).each do |i|
-    config.vm.define "vanode#{i}" do |node|
+    config.vm.define "node#{i}" do |node|
       # set base image for the vagrant box
       config.vm.box = "opensuse/Leap-15.2.x86_64"
       config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-      config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
-      config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+      # config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
+      # config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
       # config.ssh.insert_key = 'false'
       # config.ssh.private_key_path = ["~/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"] this line causes failure of vagrant up
+      # from https://devops.stackexchange.com/questions/1237/how-do-i-configure-ssh-keys-in-a-vagrant-multi-machine-setup
+      config.vm.provision "file", source: "id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
+      public_key = File.read("id_rsa.pub")
+      config.vm.provision :shell, :inline =>"
+        echo 'Copying host public SSH Keys to the VM'
+        mkdir -p /home/vagrant/.ssh
+        chmod 700 /home/vagrant/.ssh
+        echo '#{public_key}' >> /home/vagrant/.ssh/authorized_keys
+        chmod -R 600 /home/vagrant/.ssh/authorized_keys
+        echo 'Host 192.168.*.*' >> /home/vagrant/.ssh/config
+        echo 'StrictHostKeyChecking no' >> /home/vagrant/.ssh/config
+        echo 'UserKnownHostsFile /dev/null' >> /home/vagrant/.ssh/config
+        chmod -R 600 /home/vagrant/.ssh/config
+        ", privileged: false      
 
       # set the static IP for the vagrant box
-      node.vm.network "private_network", ip: "192.168.50.10#{i}"
+      node.vm.network "private_network", ip: "192.168.56.4"
       # configure the parameters for VirtualBox provider
       node.vm.provider "virtualbox" do |v|
-        v.name = "node#{i}"
+        v.name = "vnode#{i}"
         v.memory = 2048
         v.cpus = 2
       end
