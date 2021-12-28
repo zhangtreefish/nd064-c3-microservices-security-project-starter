@@ -41,6 +41,7 @@ cd "/Users/mommy/VirtualBox VMs"
 find . -type f -name "Leap*" -print
 find . -type f -name "Leap*" -delete
 rm -r -f Leap-15.2_16*
+rm -r -f "/Users/mommy/VirtualBox VMs/node1"
 /Users/mommy/codebase/pythonProjects/nd064-c3-microservices-security-project-starter/starter
 
 (base) mommy@Mommys-iMac starter % vsc  
@@ -126,4 +127,22 @@ initially: only vagrant; did `cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys`:
 localhost:~ # cat /root/.ssh/authorized_keys 
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQ3Z945k4R3FDdydUmUhGFkKNCwiwBxXMFAbWRWPAdsisz6c+dt9yZxL0A5zBFpaHuIjSfrq8ylnN8yJmsenxPY7Tm9RszqeAKM/91Teu8MXbCROsN9VUmFp4jFREd9ktKtFzzrl0gjKDU8WEyRpFUEIYJmZSKdZdAMBh47lTH9BG78v5x/xytHjN4HWolgagRqALBGqqFiWY6OBKi5YXzLtaSb443RGVL24+jLppsxI0GJ700l4f+kqp8AIOPR7mqC21keawG60sYT+sbhS/eM8wOitto9YuzpJh5GxVmLhVaLdnqgBywGbr/u4qPvc9HrfBwwID32T6UVLq7ms4t vagrant
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFgA8ieKpxlw5rVqInxdIAdoAuXnimtSCmihKkYfxSqT0ymHgkM4vtxNqmuw8/BEyMU4+iHQZt1U5t9kNWmNXh1nPmvWZvZKPpqogTAKcf4dY6CWLpRLlwQyHXzIVIORubG6pCrdCWze+1yFDz9lIAWP6mbXMlTeHwv+4Pl5huVbedjtLQCKJsvgkpOO0ObSbN5YzUFueddIayX4mu5bNOaIKE1HYaZ3uhNdmAN1MRA/i/w3b7hwgPZOjs4muWgrhVKy8m8IKxfxlYdeomlXPiB2aovdZnqfN23L7+k+t4/ms+l6w5MkFi1Fg5wXL+QaHnKDx76lsZcjLxUan0+ZmJ mommy@Mommys-iMac.local
-root has host private ssh key; rke and vagrant does not have private key id_rsa. 
+root has host private ssh key; rke and vagrant does not have private key id_rsa.
+
+https://stackoverflow.com/questions/112396/how-do-i-remove-the-passphrase-for-the-ssh-key-without-having-to-create-a-new-ke
+$ ssh-keygen -p
+
+restart; at commit dccfddcf8b1ce44cca117e15576cfdded42e1de0 ; authorized key not the public key; 
+
+ssh -i /Users/mommy/codebase/pythonProjects/nd064-c3-microservices-security-project-starter/starter/.vagrant/machines/node1/virtualbox/private_key -o PasswordAuthentication=no vagrant@192.168.50.101 //timedout
+
+ssh-copy-id -i ~/.ssh/id_rsa vagrant@192.168.50.101
+
+https://github.com/SUSE-Rancher-Community/local-setup-of-rancher-with-rke
+
+ssh-keygen -t rsa -b 2048 //en saved in /Users/mommy/.ssh/nd064_rsa.
+Your public key has been saved in /Users/mommy/.ssh/nd064_rsa.pub.
+sudo ssh-copy-id -i ~/.ssh/nd064_rsa vagrant@192.168.50.101
+config.ssh.private_key_path 
+https://stackoverflow.com/questions/61837844/vagrant-custom-ssh-key-authentication-failure
+https://devops.stackexchange.com/questions/1237/how-do-i-configure-ssh-keys-in-a-vagrant-multi-machine-setup
