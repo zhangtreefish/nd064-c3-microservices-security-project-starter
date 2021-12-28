@@ -2,6 +2,6 @@
 .idea/
 *.pyc
 __pycache__/
-.vagrant/
+../.vagrant/
 
 
