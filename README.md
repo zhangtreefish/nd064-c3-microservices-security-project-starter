@@ -138,3 +138,7 @@ ssh -i /Users/mommy/codebase/pythonProjects/nd064-c3-microservices-security-proj
 ssh-copy-id -i ~/.ssh/id_rsa vagrant@192.168.50.101
 
 https://github.com/SUSE-Rancher-Community/local-setup-of-rancher-with-rke
+
+ssh-keygen -t rsa -b 2048 //en saved in /Users/mommy/.ssh/nd064_rsa.
+Your public key has been saved in /Users/mommy/.ssh/nd064_rsa.pub.
+sudo ssh-copy-id -i ~/.ssh/nd064_rsa vagrant@192.168.50.101
