@@ -2,3 +2,6 @@
 .idea/
 *.pyc
 __pycache__/
+.vagrant/
+kube_config_cluster.yml
+cluster.rkestate
