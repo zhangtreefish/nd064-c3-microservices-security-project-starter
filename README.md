@@ -83,10 +83,8 @@ Have a lot of fun...
 localhost:~ # ls ~/.ssh
 authorized_keys
 localhost:~ # cat ~/.ssh/authorized_keys 
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9UOszqhL05yZcDG8qMxMVCw1ETjo1p3pzbxDbJsifJjU1RHFmR37Hq0MrYm8ioCjwddPuA4s4M0G/uOP/iaWmqzOHgsS3YNIbf1+6Ie+rgU0FFuBJdKvk/jxNAhk0pWRWvEHQpvdC7e6lrB4Z4GHUWz+EO5yyPO5axhQCerYuJyZjJAEvl0flQhwfClAcqnFs6AOVThPa014T+pSakYs56/dOx5W6rbN/qZTWKZ6HjQ3xqzRP53hTFySqyLsYrqFtgQvDinShqi7D3s99A7fuHWg0uKDHjYvAvDUUeU7HI5eVlE7cH6b27fIBe1l0MCdhK8DVATzIleJs5/Ce/5GR vagrant 
 //the above output is the same as `cat /root/.ssh/authorized_keys` and `cat /home/rke/.ssh/authorized_keys `, 
 different from `localhost:~ # cat /home/vagrant/.ssh/authorized_keys`:
-ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key`
 //this time vagrant ssh automatically get root access ?
 https://jhooq.com/vagrant-copy-public-key/
 ssh -i /Users/mommy/codebase/pythonProjects/nd064-c3-microservices-security-project-starter/starter/.vagrant/machines/node1/virtualbox/private_key -o PasswordAuthentication=no vagrant@127.0.0.1 -p 3150
@@ -99,7 +97,6 @@ drwx------ 5 root root 4096 Dec 27 19:36 ..
 -rw-r--r-- 1 root root  405 Dec 27 19:37 id_rsa.pub
 drwx------ 2 root root 4096 Dec 27 19:37 .
 localhost:~ # cat ~/.ssh/id_rsa.pub
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFgA8ieKpxlw5rVqInxdIAdoAuXnimtSCmihKkYfxSqT0ymHgkM4vtxNqmuw8/BEyMU4+iHQZt1U5t9kNWmNXh1nPmvWZvZKPpqogTAKcf4dY6CWLpRLlwQyHXzIVIORubG6pCrdCWze+1yFDz9lIAWP6mbXMlTeHwv+4Pl5huVbedjtLQCKJsvgkpOO0ObSbN5YzUFueddIayX4mu5bNOaIKE1HYaZ3uhNdmAN1MRA/i/w3b7hwgPZOjs4muWgrhVKy8m8IKxfxlYdeomlXPiB2aovdZnqfN23L7+k+t4/ms+l6w5MkFi1Fg5wXL+QaHnKDx76lsZcjLxUan0+ZmJ mommy@Mommys-iMac.local
 
 localhost:~ # cat /root/.ssh/id_rsa
 -----BEGIN RSA PRIVATE KEY-----
@@ -125,8 +122,6 @@ FATA[0225] Cluster must have at least one etcd plane host: failed to connect to 
 
 initially: only vagrant; did `cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys`:
 localhost:~ # cat /root/.ssh/authorized_keys 
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQ3Z945k4R3FDdydUmUhGFkKNCwiwBxXMFAbWRWPAdsisz6c+dt9yZxL0A5zBFpaHuIjSfrq8ylnN8yJmsenxPY7Tm9RszqeAKM/91Teu8MXbCROsN9VUmFp4jFREd9ktKtFzzrl0gjKDU8WEyRpFUEIYJmZSKdZdAMBh47lTH9BG78v5x/xytHjN4HWolgagRqALBGqqFiWY6OBKi5YXzLtaSb443RGVL24+jLppsxI0GJ700l4f+kqp8AIOPR7mqC21keawG60sYT+sbhS/eM8wOitto9YuzpJh5GxVmLhVaLdnqgBywGbr/u4qPvc9HrfBwwID32T6UVLq7ms4t vagrant
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFgA8ieKpxlw5rVqInxdIAdoAuXnimtSCmihKkYfxSqT0ymHgkM4vtxNqmuw8/BEyMU4+iHQZt1U5t9kNWmNXh1nPmvWZvZKPpqogTAKcf4dY6CWLpRLlwQyHXzIVIORubG6pCrdCWze+1yFDz9lIAWP6mbXMlTeHwv+4Pl5huVbedjtLQCKJsvgkpOO0ObSbN5YzUFueddIayX4mu5bNOaIKE1HYaZ3uhNdmAN1MRA/i/w3b7hwgPZOjs4muWgrhVKy8m8IKxfxlYdeomlXPiB2aovdZnqfN23L7+k+t4/ms+l6w5MkFi1Fg5wXL+QaHnKDx76lsZcjLxUan0+ZmJ mommy@Mommys-iMac.local
 root has host private ssh key; rke and vagrant does not have private key id_rsa.
 
 https://stackoverflow.com/questions/112396/how-do-i-remove-the-passphrase-for-the-ssh-key-without-having-to-create-a-new-ke
@@ -146,3 +141,37 @@ sudo ssh-copy-id -i ~/.ssh/nd064_rsa vagrant@192.168.50.101
 config.ssh.private_key_path 
 https://stackoverflow.com/questions/61837844/vagrant-custom-ssh-key-authentication-failure
 https://devops.stackexchange.com/questions/1237/how-do-i-configure-ssh-keys-in-a-vagrant-multi-machine-setup
+vagrant up
+ssh-copy-id -i ~/.ssh/id_rsa root@192.168.56.4
+rke remove
+rke up
+export KUBECONFIG=kube_config_cluster.yml
+kubectl --kubeconfig kube_config_cluster.yml get nodes
+kubectl --kubeconfig kube_config_cluster.yml get po -A
+kubectl get po -A
+
+helm version //3.7.1
+ssh root@192.168.56.4
+inside vm:
+per official Falco guide : https://falco.org/docs/getting-started/installation/#suse
+rpm --import https://falco.org/repo/falcosecurity-3672BA8F.asc
+curl -s -o /etc/zypp/repos.d/falcosecurity.repo https://falco.org/repo/falcosecurity-rpm.repo
+
+zypper -n dist-upgrade
+zypper -n install kernel-default-devel-$(uname -r | sed s/\-default//g)
+exit
+vagrant halt node1 //doing "reboot" inside vm damaged node1
+//still "kernel-default-devel-5.3.18-lp152.106"
+zypper -n install kernel-default-devel 
+$(uname -r | sed s/\-default//g) //5.3.18-lp152.106
+zypper -n install kernel-default-devel //(7/7) Installing: kernel-default-devel-5.3.18-lp152.106.1.x86_64 
+zypper -n install falco //driver installed on vm directly
+falco --help
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts //already exists on host
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack --kubeconfig kube_config_cluster.yml 
+//kube-prometheus-stack has been installed. Check its status by running:
+  kubectl --namespace default get pods -l "release=prometheus"
+
+https://knowledge.udacity.com/questions/758648
