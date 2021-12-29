@@ -167,3 +167,5 @@ drwxr-xr-x  8 vagrant vagrant 4096 Dec 26 15:12 vagrant
 drwxr-xr-x 24 root    root    4096 Dec 26 15:14 ..
 drwxr-xr-x  4 root    root    4096 Dec 28 23:25 .
 drwxr-xr-x  3 rke     root    4096 Dec 28 23:31 rke
+
+https://stackoverflow.com/questions/39928853/gitignore-for-all-files-in-folders-and-subfolders
