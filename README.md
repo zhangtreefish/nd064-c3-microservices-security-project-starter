@@ -243,3 +243,82 @@ Linux localhost 5.3.18-lp152.106-default #1 SMP Mon Nov 22 08:38:17 UTC 2021 (52
 then reinstall: zypper -n install //TODO: install from host
 
 set memory to 4096 and repeat
+
+11. hack
+kubectl --kubeconfig kube_config_cluster.yml exec -it falco-29ddb -- /bin/bash
+adduser evil_hacker
+cat /etc/shadow > /dev/null
+nc -l 8080
+./falco_metrics.sh
+
+kubectl --kubeconfig kube_config_cluster.yml logs -f falco-29ddb | grep -A 2 adduser 
+kubectl --kubeconfig kube_config_cluster.yml logs -f falco-29ddb | grep 'nc\|\/etc\/shadow\|adduser' 
+https://falco.org/docs/rules/
+container.id != host and proc.name = bash
+
+12. Grafana
+kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-grafana-f87bfb777-c998s 3000
+kubectl --kubeconfig kube_config_cluster.yml port-forward --namespace default falco-exporter-j2m2x 9376
+
+kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-prometheus-kube-prometheus-prometheus-0 9090
+//`E1230 18:38:38.363046   12299 portforward.go:400]`
+
+`The connection to the server 127.0.0.1:6443 was refused - did you specify the right host or port?` 
+redo: `export KUBECONFIG=kube_config_cluster.yml`
+
+(base) mommy@Mommys-iMac starter % kubectl describe servicemonitor falco-exporter
+Name:         falco-exporter
+Namespace:    default
+Labels:       app.kubernetes.io/instance=falco-exporter
+              app.kubernetes.io/managed-by=Helm
+              app.kubernetes.io/name=falco-exporter
+              app.kubernetes.io/version=0.6.0
+              helm.sh/chart=falco-exporter-0.6.3
+Annotations:  meta.helm.sh/release-name: falco-exporter
+              meta.helm.sh/release-namespace: default
+API Version:  monitoring.coreos.com/v1
+Kind:         ServiceMonitor
+Metadata:
+  Creation Timestamp:  2021-12-30T21:35:40Z
+  Generation:          1
+  Managed Fields:
+    API Version:  monitoring.coreos.com/v1
+    Fields Type:  FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .:
+          f:meta.helm.sh/release-name:
+          f:meta.helm.sh/release-namespace:
+        f:labels:
+          .:
+          f:app.kubernetes.io/instance:
+          f:app.kubernetes.io/managed-by:
+          f:app.kubernetes.io/name:
+          f:app.kubernetes.io/version:
+          f:helm.sh/chart:
+      f:spec:
+        .:
+        f:endpoints:
+        f:selector:
+          .:
+          f:matchLabels:
+            .:
+            f:app.kubernetes.io/instance:
+            f:app.kubernetes.io/name:
+    Manager:         helm
+    Operation:       Update
+    Time:            2021-12-30T21:35:40Z
+  Resource Version:  13906
+  UID:               693a025e-51c9-4eb1-abf7-0335b07ff0bc
+Spec:
+  Endpoints:
+    Port:  metrics
+  Selector:
+    Match Labels:
+      app.kubernetes.io/instance:  falco-exporter
+      app.kubernetes.io/name:      falco-exporter
+Events:                            <none>
+
+kubectl --kubeconfig kube_config_cluster.yml edit prometheus prometheus-kube-prometheus-prometheus
+kubectl --kubeconfig kube_config_cluster.yml apply -f manual_service_monitor_falco_exporter.yml
