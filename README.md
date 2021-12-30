@@ -141,41 +141,105 @@ sudo ssh-copy-id -i ~/.ssh/nd064_rsa vagrant@192.168.50.101
 config.ssh.private_key_path 
 https://stackoverflow.com/questions/61837844/vagrant-custom-ssh-key-authentication-failure
 https://devops.stackexchange.com/questions/1237/how-do-i-configure-ssh-keys-in-a-vagrant-multi-machine-setup
+
+1. 
 vagrant up
+2. 
 ssh-copy-id -i ~/.ssh/id_rsa root@192.168.56.4
-rke remove
+3. 
+rke remove //since/if using the same host to spin up rke again; otherwise: FATA[0228] [controlPlane] Failed to upgrade Control Plane: [[[controlplane] Error getting node node1:  "node1" not found]] 
 rke up
 export KUBECONFIG=kube_config_cluster.yml
 kubectl --kubeconfig kube_config_cluster.yml get nodes
+kubectl get nodes -o wide  
+//
+NAME    STATUS   ROLES                      AGE     VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION             CONTAINER-RUNTIME
+node1   Ready    controlplane,etcd,worker   4h27m   v1.20.4   10.0.2.15     <none>        openSUSE Leap 15.2   5.3.18-lp152.106-default   docker://20.10.9-ce
+
+kubectl get all --all-namespaces -o wide
+
 kubectl --kubeconfig kube_config_cluster.yml get po -A
 kubectl get po -A
-
+ 
+kubectl describe po calico-node-sqwtz -n kube-system 
+kubectl describe  po calico-kube-contrlolres-84cdfc98bd-p7lgz -n kube-system 
+//  `  Normal   Scheduled               24m                   default-scheduler  Successfully assigned kube-system/calico-kube-controllers-84cdfc98bd-p7lgz to node1`
+`Warning  NetworkNotReady         11m (x7 over 12m)    kubelet            network is not ready: runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:docker: network plugin is not ready: cni config uninitialized`
+//CrashLoopBackOff
+kubectl edit -n kube-system daemonset.apps/calico-node 
+//1 to 60 ; on kubectl get po -A: Unable to connect to the server: net/http: request canceled (Client.Timeout exceeded while awaiting headers); back to 2
+kubectl edit -n kube-system deployment.apps/calico-kube-controllers
+per https://stackoverflow.com/questions/69190171/calico-kube-controllers-and-calico-node-are-not-ready-crashloopbackoff
+kubectl describe po calico-kube-controllers-84cdfc98bd-p7lgz -n kube-system //`  Warning  Unhealthy       3h38m (x13 over 3h40m)  kubelet  Liveness probe failed: unknown shorthand flag: 'l' in -l`
+kubectl replace -f /var/folders/19/40gs9bcd5kjd61yfdy6f875w0000gn/T/kubectl-edit-wid9m.yaml
+reboot by `vagrant reload` per https://stackoverflow.com/questions/48190928/kubernetes-pod-remains-in-containercreating-status
+fix calico-kube-controller restarting and not ready issue by setting livenss and readiness timeout to 60s AND changing -l to -r per error: https://issueexplorer.com/issue/projectcalico/calico/4935
+followed by `vagrant reload`: after that: get po shows 6 prometheus pods in default, instead of 1 earllier when nginx-ingress-controller was not ready; nginx-ingress-controller-tr6zl
+4. 
 helm version //3.7.1
+5.  flaco driver
 ssh root@192.168.56.4
 inside vm:
 per official Falco guide : https://falco.org/docs/getting-started/installation/#suse
 rpm --import https://falco.org/repo/falcosecurity-3672BA8F.asc
 curl -s -o /etc/zypp/repos.d/falcosecurity.repo https://falco.org/repo/falcosecurity-rpm.repo
-
+6.  falco header
 zypper -n dist-upgrade
 zypper -n install kernel-default-devel-$(uname -r | sed s/\-default//g)
 exit
-vagrant halt node1 //doing "reboot" inside vm damaged node1
+
 //still "kernel-default-devel-5.3.18-lp152.106"
 zypper -n install kernel-default-devel 
 $(uname -r | sed s/\-default//g) //5.3.18-lp152.106
+//compare: localhost:~ # uname -a
+Linux localhost 5.3.18-lp152.106-default #1 SMP Mon Nov 22 08:38:17 UTC 2021 (52078fe) x86_64 x86_64 x86_64 GNU/Linux
+
+vagrant halt node1 //doing "reboot" inside vm damaged node1
 zypper -n install kernel-default-devel //(7/7) Installing: kernel-default-devel-5.3.18-lp152.106.1.x86_64 
-zypper -n install falco //driver installed on vm directly
-falco --help
- out on host:
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts //already exists on host
+//NOT DO: zypper -n install falco //driver installed on vm directly
+exit
+7. 
+//vagrant halt node1 //doing "reboot" inside vm damaged node1
+vagrant reload
+8. out on host, per https://knowledge.udacity.com/questions/758648 and https://github.com/prometheus-community/helm-charts
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 
+//already exists on host
 helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack --kubeconfig kube_config_cluster.yml 
 //kube-prometheus-stack has been installed. Check its status by running:
   kubectl --namespace default get pods -l "release=prometheus"
 //not `kubectl --kubeconfig kube_config_cluster.yml --namespace default get pods -l "release=prometheus-operator-1619828194"` ?
-per https://knowledge.udacity.com/questions/758648 and https://prometheus-community.github.io/helm-charts/
-
+kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-kube-prometheus-operator-7c64864bb7-qfcjx 9090
+//E1230 09:55:14.208365    7307 portforward.go:400] an error occurred forwarding 9090 -> 9090: error forwarding port 9090 to pod 79044df970ddaeb143e03939114a2a90b49fdb535bd506cb3d29b2f573d8267f, uid : exit status 1: 2021/12/30 15:55:11 socat[8457] E connect(5, AF=2 127.0.0.1:9090, 16): Connection refused
+9. falco ds
 helm repo add falcosecurity https://falcosecurity.github.io/charts
 helm repo update
 helm install --kubeconfig kube_config_cluster.yml falco falcosecurity/falco --set falco.grpc.enabled=true --set falco.grpcOutput.enabled=true
+per https://github.com/falcosecurity/charts/tree/master/falco#grpc-over-unix-socket-default
+//falco not ready ??
+try `vagrant halt`, `vagrant up` again: falco ready
+kubectl --kubeconfig kube_config_cluster.yml get ds falco -o yaml | grep serviceAcc
+falco-5d2ct //falco-29ddb
+kubectl --kubeconfig kube_config_cluster.yml exec -it falco-5d2ct -- /bin/bash //
+echo $KUBECONFIG //kube_config_cluster.yml
+kubectl exec -it falco-29ddb -- /bin/bash //auth error
+falco --help
+cat /etc/falco/falco.yaml
+10.  falco exporter per https://github.com/falcosecurity/charts/tree/master/falco-exporter
+helm install --kubeconfig kube_config_cluster.yml falco-exporter --set serviceMonitor.enabled=true falcosecurity/falco-exporter
+
+ try deleting pod to get it ready:
+ (base) mommy@Mommys-iMac starter % kubectl delete po --grace-period=0 --force   -n kube-system calico-kube-controllers-84cdfc98bd-j8w7v
+
+ deleting the pod does no automatically regenerate the pod. ??
+ try rerun falco: helm install --kubeconfig kube_config_cluster.yml falco falcosecurity/falco --set falco.grpc.enabled=true --set falco.grpcOutput.enabled=true
+
+had to remove first:
+zypper rm falco
+
+localhost:~ # uname -a
+Linux localhost 5.3.18-lp152.106-default #1 SMP Mon Nov 22 08:38:17 UTC 2021 (52078fe) x86_64 x86_64 x86_64 GNU/Linux
+
+then reinstall: zypper -n install //TODO: install from host
+
+set memory to 4096 and repeat
