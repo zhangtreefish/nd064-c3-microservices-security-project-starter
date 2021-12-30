@@ -167,11 +167,15 @@ $(uname -r | sed s/\-default//g) //5.3.18-lp152.106
 zypper -n install kernel-default-devel //(7/7) Installing: kernel-default-devel-5.3.18-lp152.106.1.x86_64 
 zypper -n install falco //driver installed on vm directly
 falco --help
-
+ out on host:
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts //already exists on host
 helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack --kubeconfig kube_config_cluster.yml 
 //kube-prometheus-stack has been installed. Check its status by running:
   kubectl --namespace default get pods -l "release=prometheus"
+//not `kubectl --kubeconfig kube_config_cluster.yml --namespace default get pods -l "release=prometheus-operator-1619828194"` ?
+per https://knowledge.udacity.com/questions/758648 and https://prometheus-community.github.io/helm-charts/
 
-https://knowledge.udacity.com/questions/758648
+helm repo add falcosecurity https://falcosecurity.github.io/charts
+helm repo update
+helm install --kubeconfig kube_config_cluster.yml falco falcosecurity/falco --set falco.grpc.enabled=true --set falco.grpcOutput.enabled=true
