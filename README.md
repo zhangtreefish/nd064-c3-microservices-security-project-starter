@@ -257,12 +257,12 @@ https://falco.org/docs/rules/
 container.id != host and proc.name = bash
 
 12. Grafana
+export KUBECONFIG=kube_config_cluster.yml
 kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-grafana-f87bfb777-c998s 3000
 kubectl --kubeconfig kube_config_cluster.yml port-forward --namespace default falco-exporter-j2m2x 9376
-
 kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-prometheus-kube-prometheus-prometheus-0 9090
 //`E1230 18:38:38.363046   12299 portforward.go:400]`
-
+https://grafana.com/grafana/dashboards/11914
 `The connection to the server 127.0.0.1:6443 was refused - did you specify the right host or port?` 
 redo: `export KUBECONFIG=kube_config_cluster.yml`
 
@@ -322,3 +322,176 @@ Events:                            <none>
 
 kubectl --kubeconfig kube_config_cluster.yml edit prometheus prometheus-kube-prometheus-prometheus
 kubectl --kubeconfig kube_config_cluster.yml apply -f manual_service_monitor_falco_exporter.yml
+
+13. A. harden host docker environment
+ssh root@192.168.56.4            //vagrant ssh after rke remove                                                    
+localhost:~ # docker version //20.10.9-ce
+ API version:       1.41
+ Go version:        go1.16.8
+
+vi install_go.sh 
+chmod 744 install_go.sh 
+./install_go.sh  
+//t, y
+//go version go1.15.15 linux/amd64
+
+//docker_bench.sh
+sudo zypper install git 
+git version //git version 2.26.2
+git clone https://github.com/aquasecurity/docker-bench.git
+cd docker-bench
+go build -o docker-bench 
+./docker-bench --help 
+
+./docker-bench --include-test-output > suse_docker_environment_out_of_box_output.txt 
+cat suse_docker_environment_out_of_box_output.txt | grep FAIL > suse_docker_environment_out_of_box_FAIL.txt
+cat suse_docker_environment_out_of_box_FAIL.txt //38
+
+2.1 Ensure network traffic is restricted between containers on the default bridge (Scored)
+docker network ls --quiet | xargs docker network inspect --format '{{ .Name}}: {{ .Options }}'
+dockerd --icc=false //`failed to start daemon: pid file found, ensure docker is not running or delete /var/run/docker.pid`
+"icc": false //bears impact
+touch /etc/subuid /etc/subgid
+dockerd --userns-remap=default
+
+localhost:~/docker-bench # cat /etc/subuid
+vagrant:100000:65536
+dockremap:100000000:100000001
+rke:165536:65536
+
+localhost:~/docker-bench # cat /etc/subgid
+vagrant:100000:65536
+dockremap:100000000:100000001
+rke:165536:65536
+
+2.13 Ensure live restore is enabled (Scor
+Run Docker in daemon mode
+Remediation:
+Run Docker in daemon mode and pass --live-restore to it as an argument. For Example,
+dockerd --live-restore
+adding
+
+{
+  "live-restore": true
+} //impact: none
+to /etc/docker/daemon.json per https://stackoverflow.com/questions/63434189/does-restarting-docker-service-kills-all-containers
+/etc/docker/daemon.json
+5.11 Ensure that CPU priority is set appropriately on containers (Scored)
+ docker ps --quiet --all | xargs docker inspect --format '{{ .Id }}: CpuShares={{ .HostConfig.CpuShares }}'
+  except: 
+  CONTAINER ID   IMAGE                                                    COMMAND                  CREATED        STATUS                      PORTS     NAMES
+  4e328c45f92c   rancher/rke-tools:v0.1.78                                "/docker-entrypoint.…"   32 hours ago   Up 28 hours                           etcd-rolling-snapshots
+
+  92e31537a5b9   rancher/hyperkube:v1.20.4-rancher1                       "/opt/rke-tools/entr…"   32 hours ago   Up 28 hours                           kube-proxy
+d9c845df52f5   rancher/hyperkube:v1.20.4-rancher1                       "/opt/rke-tools/entr…"   32 hours ago   Up 28 hours                           kubelet
+ece2615e6ed4   rancher/hyperkube:v1.20.4-rancher1                       "/opt/rke-tools/entr…"   32 hours ago   Up 28 hours                           kube-scheduler
+171e287148e5   rancher/hyperkube:v1.20.4-rancher1                       "/opt/rke-tools/entr…"   32 hours ago   Up 28 hours                           kube-controller-manager
+b1ce95a179c1   rancher/hyperkube:v1.20.4-rancher1                       "/opt/rke-tools/entr…"   32 hours ago   Up 28 hours                           kube-apiserver
+f6662cebc634   rancher/rke-tools:v0.1.72                                "/bin/bash"              32 hours ago   Created                               service-sidekick
+898b172b3975   rancher/coreos-etcd:v3.4.14-rancher1                     "/usr/local/bin/etcd…"   32 hours ago   Up 28 hours                           etcd
+d5c093f42691   rancher/rke-tools:v0.1.72                                "/docker-entrypoint.…"   32 hours ago   Exited (0) 32 hours ago               cluster-state-deployer
+
+5.25 Ensure that the container is restricted from acquiring additional privileges (Scored)
+ docker ps --quiet --all | xargs docker inspect --format '{{ .Id }}: SecurityOpt={{ .HostConfig.SecurityOpt }}'
+ //docker run --rm -it --security-opt=no-new-privileges ubuntu bash
+
+ //docker build -t opensuse/hardened-v1.0 . --no-cache=true
+ docker build . -t opensuse/leap:latest -m 512mb --no-cache=true //works
+
+//docker run --interactive --tty --memory 512mb opensuse/leap /bin/bash
+//docker run -u --detach --restart=on-failure:5 --memory 512mb opensuse/leap
+./docker-bench --include-test-output > suse_docker_environment_hardened.txt 
+localhost:~/docker-bench # cat suse_docker_environment_hardened.txt | grep FAIL > suse_docker_environment_hardened_FAIL.txt
+`diff suse_docker_environment_out_of_box_FAIL.txt suse_docker_environment_hardened_FAIL.txt`
+: see screenshot at submissions/docker_bench_2_15_live_restore_enabled.jpeg
+at /root:
+docker build . -t opensuse/leap:hardened-v2.0 -m 512mb --no-cache=true //Successfully tagged opensuse/leap:hardened-v2.0
+docker tag opensuse/leap:hardened-v2.0 treefishdocker/udacity-microservices-security:hardened-v2.0
+
+docker run opensuse/leap:hardened-v2.0
+docker push treefishdocker/udacity-microservices-security:hardened-v2.0
+update Dockerfile with the above image, and 
+docker run --detach --restart=on-failure:5 --memory 256mb  --security-opt=no-new-privileges treefishdocker/udacity-microservices-security:hardened-v2.0 //WARNING: Your kernel does not support swap limit capabilities or the cgroup is not mounted. Memory limited without swap.
+https://stackoverflow.com/questions/48685667/what-does-docker-mean-when-it-says-memory-limited-without-swap
+
+./docker-bench --include-test-output > suse_docker_environment_hardened_2.txt 
+cat suse_docker_environment_hardened_2.txt | grep FAIL > suse_docker_environment_hardened_2_FAIL.txt
+
+https://www.techrepublic.com/article/how-to-use-docker-bench-for-security-to-audit-your-container-deployments/ 
+
+docker ps --quiet --all | xargs docker inspect --format '{{ .Id }}: Memory={{ .HostConfig.Memory }}'
+//
+0c58af0992ddc70678a36c9c81aaa1ffd6be0970a5fedea8c8d1644767c4e059: Memory=536870912
+46ae95bdc7b446e6dc2bf6d12d6feb7c15786ffdd007fc694ff445f849240457: Memory=536870912
+0c58af0992dd   treefishdocker/udacity-microservices-security:hardened-v2.0   "/bin/bash"              11 minutes ago      Exited (0) 11 minutes ago                intelligent_noether
+e9681b628bbd6eb1e34da6d21571407597e367ce71abf1bf478d94064fd87388: Memory=268435456
+
+13. B (repeat with new vm instance)vagrant destroy and repeat docker-bench tests:
+`submissions/docker_bench_2/suse_vagrant_out_of_box.jpeg`
+
+2.8 Enable user namespace support (Scored): impact
+ ps -p $(docker inspect --format='{{ .State.Pid }}' <CONTAINER ID>) -o pid,user
+
+2.14 Ensure Userland Proxy is Disabled (Scored)
+ ps -ef | grep dockerd
+ dockerd --userland-proxy=false
+
+2.17 Ensure containers are restricted from acquiring new privileges (Scored)
+ ps -ef | grep dockerd
+ dockerd --no-new-privileges
+
+ rke remove
+ vagrant ssh
+ cat /etc/docker/daemon.json
+ add "icc": false,
+    "userns-remap": "default",
+    "live-restore": true,
+    "userland-proxy": false,
+    "no-new-privileges": true
+
+    per https://www.techrepublic.com/article/how-to-use-docker-bench-for-security-to-audit-your-container-deployments/
+    https://documentation.suse.com/sles/12-SP4/html/SLES-all/cha-audit-setup.htmlsystemctl 
+status audit
+    
+./audit.sh
+    
+/etc/audit/auditd.conf different from TOBE
+systemctl enable auditd
+cat /etc/audit/audit.rules
+vi /etc/audit/audit.rules //add the set as in https://www.techrepublic.com/article/how-to-use-docker-bench-for-security-to-audit-your-container-deployments/
+
+systemctl restart auditd
+systemctl restart docker
+
+./docker-bench --include-test-output > suse_vagrant_audit.txt 
+cat suse_vagrant_audit.txt | grep FAIL > suse_vagrant_audit_FAIL.txt
+cat suse_vagrant_audit_FAIL.txt 
+
+diff suse_vagrant_audit_FAIL.txt suse_docker_environment_out_of_box_FAIL.txt //38 fown to 29 : see a screenshot at "submissions/suse_docker_environment_hardened.jpeg"
+
+14. 
+docker login
+docker pull opensuse/leap:latest
+vi Dockerfile //copy ans paste the Dockerfile from project /starter to inside localhost SUSE vm
+docker build . -t opensuse/leap:hardened-v2.1 -m 512mb --no-cache=true 
+docker tag opensuse/leap:hardened-v2.1 treefishdocker/udacity-microservices-security:hardened-v2.1
+docker image ls
+docker run opensuse/leap:hardened-v2.1
+docker ps -a
+docker push treefishdocker/udacity-microservices-security:hardened-v2.1
+
+./docker-bench --include-test-output > suse_vagrant_dockerfile.txt 
+cat suse_vagrant_dockerfile.txt | grep FAIL > suse_vagrant_dockerfile_FAIL.txt
+cat suse_vagrant_dockerfile_FAIL.txt //29
+diff suse_vagrant_audit_FAIL.txt suse_vagrant_dockerfile_FAIL.txt
+26c26
+< [FAIL] 5.14 Ensure that the 'on-failure' container restart policy is set to '5' (Automated)
+---
+> [FAIL] 5.12 Ensure that the container's root filesystem is mounted as read only (Automated)
+
+docker rm <Container id>
+docker run --detach --restart=on-failure:5 --memory 512mb  --security-opt=no-new-privileges opensuse/leap:hardened-v2.1
+
+./docker-bench --include-test-output > suse_vagrant_dockerfile_run2.txt 
+cat suse_vagrant_dockerfile_run2.txt | grep FAIL > suse_vagrant_dockerfile_run2_FAIL.txt
+cat suse_vagrant_dockerfile_run2_FAIL.txt 

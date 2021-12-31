@@ -1,5 +1,5 @@
 1. Incident commander name: Jane Smith at CommandCenter, 
-2. Executive Summary of what happened: Someone deployed 3 cyptomining pods into our rke cluster, as evidenced in Falco Dashboard and the command below:
+2. Executive Summary of what happened: Someone deployed 3 cyptomining pods into our rke cluster, as evidenced in Falco Dashboard (pleaes see the screenshot at submissions/payload_attack.jpeg) and the command below:
 `kubectl --kubeconfig kube_config_cluster.yml get pods --all-namespaces -o=jsonpath='{range .items[]}{"\n"}{.metadata.name}{":\t"}{range .spec.containers[]}{.image}{", "}{end}{end}' |\ sort`
 3. Summary of what was affected:  Access to an administrative terminal with the kubeconfig file of our rke cluster or through the UI was compromised.
 4. Summmry of the impact: the unintended pods cause cpu usage in the cluster to go up, as evidenced by the "Kubernetes/Compute Resources" panel on Grafana; the unwarratned access can bring a myriad of security risks.
