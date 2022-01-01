@@ -1,0 +1,9 @@
+How will you test the changes? 
+The changes will be tested locally first in dev, using Rancher, kube-bench;
+Then the changes will be deployed to dev, staging and finally as canary in production environment to ensure no regression (of normal functionalities)  takes place.  
+All environments are run in CI/CD pipelines, with unit, integration, and performance and security testing all hooked in place to alert any breach of SLOs. 
+
+How will you ensure the changes don't negatively affect your cluster?
+With the above plan of testing in different stages, and with all deployments and daemonsets set up for monitoring, logging and alerting using Prometheus and Grafana,
+the risks of negative impact can be reduced, and triaged via Commander to handle incidents.
+Having a zero-trust and blame-free mindset and culture will drive people to automate more.

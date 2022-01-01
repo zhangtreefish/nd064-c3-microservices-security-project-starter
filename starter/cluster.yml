@@ -65,7 +65,8 @@ services:
     secrets_encryption_config: null
     audit_log: null
     admission_configuration: null
-    event_rate_limit: null
+    event_rate_limit:
+      enabled: true
   kube-controller:
     image: ""
     extra_args: {}

@@ -17,6 +17,8 @@ No stress, you have tools and security incident response knowledge to respond ;)
 ### Project Instructions
 
 Follow the steps/instructions in the Udacity classroom to complete and submit the project.
+
+### Notes
 SSH for RKE:
 https://rancher.com/docs/rke/latest/en/config-options/
 `ssh_agent_auth: true`
@@ -495,3 +497,43 @@ docker run --detach --restart=on-failure:5 --memory 512mb  --security-opt=no-new
 ./docker-bench --include-test-output > suse_vagrant_dockerfile_run2.txt 
 cat suse_vagrant_dockerfile_run2.txt | grep FAIL > suse_vagrant_dockerfile_run2_FAIL.txt
 cat suse_vagrant_dockerfile_run2_FAIL.txt 
+
+15.
+docker pull treefishdocker/udacity-microservices-security:hardened-v2.0
+vagrant up //can not access private dockerhub repo, need vagrant cloud login
+so switch to use SUSE image
+vagrant up 
+rke up
+docker version //20.10.9-ce
+zypper in docker //No update candidate for 'docker-20.10.9_ce-lp152.2.18.1.x86_64'.
+docker run --pid=host -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
+kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened | grep FAIL
+
+16.
+cd /etc/sysctl.d
+vi 90-kubelet.conf
+sysctl -p /etc/sysctl.d/90-kubelet.conf
+
+//my_etcd_fix.sh
+groupadd --gid 52034 etcd
+useradd --comment "etcd service account" --uid 52034 --gid 52034 etcd
+chown etcd:etcd /var/lib/etcd
+docker run --pid=host -v /etc/passwd:/etc/passwd -v /etc/group:/etc/group -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
+kube-bench run --targets etcd --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened | grep FAIL
+
+docker run --pid=host -v /etc/passwd:/etc/passwd -v /etc/group:/etc/group -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
+
+kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened | grep FAIL
+
+5.2 Pod Security Policies...
+
+1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate (Automated)
+
+brew tap anchore/grype
+brew install grype //xcode error
+brew untap anchore/grype
+grype opensuse/leap:latest --scope all-layers -vv
+grype dir:/Users/mommy/codebase/pythonProjects/nd064-c3-microservices-security-project-starter/dvpwa
+
+brew install tree
+tree -f -L 1 /Users/nick.reva/udacity/vuln_app.
