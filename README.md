@@ -3,7 +3,7 @@ Security is a highly dynamic topic with ever changing threats and priorities. Ne
 
 Security is becoming harder as the velocity of deployments is accelerating. The [Synopsis 2020 Open Source Security Risk Analysis Report](https://webcache.googleusercontent.com/search?q=cache:yUCraGVAdw8J:https://www.synopsys.com/content/dam/synopsys/sig-assets/reports/2020-ossra-report.pdf+&cd=1&hl=en&ct=clnk&gl=us) revealed that 99% of audited code bases contained open source, and within those codebases 75% of vulnerabilities were left unpatched, creating risk. Incorporating security checks into each step of the build and deployment process is vital to identify security defects before they hit production.
 
-Your company CTO is worried about what your engineering team is doing to harden and monitor the company's new microservice application against malicious threat actors and payloads. You’ve completed the exercies in the course and have a baseline understanding of how to approach this. In response to the CTOs concerns students will threat model, build and harden a microservices environment based on what they learned from the exercises.
+Your company CTO is worried about what your engineering team is doing to harden and monitor the company's new microservice application against malicious threat actors and exportads. You’ve completed the exercies in the course and have a baseline understanding of how to approach this. In response to the CTOs concerns students will threat model, build and harden a microservices environment based on what they learned from the exercises.
 
 ### Goal 
 You will be presented with the challenge to build a secure Microservice environment, threat modeling and hardening the container image, run-time environment and application itself. For purposes of the project, you will be instructed to use a secure base opensuse image, covering considerations for the importance of using trustworthy base images and verifing the baselein. You will be provided with instructions to build, harden, ship and run an environment analogous to the company's new microservice application, simplified for project purposes. In the project you will define and build a new environment from the ground-up. 
@@ -144,12 +144,13 @@ config.ssh.private_key_path
 https://stackoverflow.com/questions/61837844/vagrant-custom-ssh-key-authentication-failure
 https://devops.stackexchange.com/questions/1237/how-do-i-configure-ssh-keys-in-a-vagrant-multi-machine-setup
 
+### Steps in numbers
 1. 
 vagrant up
 2. 
 ssh-copy-id -i ~/.ssh/id_rsa root@192.168.56.4
 3. 
-rke remove //since/if using the same host to spin up rke again; otherwise: FATA[0228] [controlPlane] Failed to upgrade Control Plane: [[[controlplane] Error getting node node1:  "node1" not found]] 
+rke remove //since/if using the same host to spin up rke again after vagrant destroy and start a new vm, if rke up had been run on the destroyed vm : FATA[0228] [controlPlane] Failed to upgrade Control Plane: [[[controlplane] Error getting node node1:  "node1" not found]] 
 rke up
 export KUBECONFIG=kube_config_cluster.yml
 kubectl --kubeconfig kube_config_cluster.yml get nodes
@@ -451,6 +452,8 @@ e9681b628bbd6eb1e34da6d21571407597e367ce71abf1bf478d94064fd87388: Memory=2684354
     "userland-proxy": false,
     "no-new-privileges": true
 
+see `submissions/suse_docker_environment_after_edit_daemon_Vagrantfile.jpg` for results.
+
     per https://www.techrepublic.com/article/how-to-use-docker-bench-for-security-to-audit-your-container-deployments/
     https://documentation.suse.com/sles/12-SP4/html/SLES-all/cha-audit-setup.htmlsystemctl 
 status audit
@@ -537,3 +540,17 @@ grype dir:/Users/mommy/codebase/pythonProjects/nd064-c3-microservices-security-p
 
 brew install tree
 tree -f -L 1 /Users/nick.reva/udacity/vuln_app.
+
+### Questions
+https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-1000519
+and ? dispersed througout the doc
+https://cdn.ttgtmedia.com/searchSecurityChannel/downloads/CISSP+Study+Guide+_Chapt6.pdf
+
+## References
+https://www.suse.com/c/sle-bci-support-rancher2-6/
+https://rancher.com/docs/rancher/v2.5/en/faq/networking/cni-providers/
+https://rancher.com/docs/rancher/v2.5/en/overview/architecture/
+https://rancher.com/docs/rancher/v2.5/en/cluster-provisioning/production/recommended-architecture/
+https://docs.microsoft.com/en-us/azure/architecture/microservices/model/microservice-boundaries
+https://kubernetes.io/docs/concepts/overview/components/
+https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/

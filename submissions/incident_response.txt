@@ -1,8 +1,8 @@
-1. Incident commander name: Jane Smith at CommandCenter, 
-2. Executive Summary of what happened: Someone deployed 3 cyptomining pods into our rke cluster, as evidenced in Falco Dashboard (pleaes see the screenshot at submissions/payload_attack.jpeg) and the command below:
+1. Incident commander name: Jane Smith at the Enterprise Command Center. 
+2. Executive Summary of what happened: Someone deployed crypto mining pods into our rke cluster, as evidenced in Falco Dashboard (please see the screenshot at submissions/payload_attack.jpeg) and the command below:
 `kubectl --kubeconfig kube_config_cluster.yml get pods --all-namespaces -o=jsonpath='{range .items[]}{"\n"}{.metadata.name}{":\t"}{range .spec.containers[]}{.image}{", "}{end}{end}' |\ sort`
+The names of the pods are "minergate" and "moneropool". A screenshot of the pods are at submissions/payload_attack_pods.jpg.
 3. Summary of what was affected:  Access to an administrative terminal with the kubeconfig file of our rke cluster or through the UI was compromised.
-4. Summmry of the impact: the unintended pods cause cpu usage in the cluster to go up, as evidenced by the "Kubernetes/Compute Resources" panel on Grafana; the unwarratned access can bring a myriad of security risks.
+4. Summmry of the impact: the unintended pods cause cpu usage in the cluster to go up, as evidenced by the "Kubernetes/Compute Resources" panel on Grafana; the unwarranted access can bring a myriad of security risks.
 5. Summary of the remediation steps: Delete the offending pods by `kubectl --kubeconfig kube_config_cluster.yml delete pod <pod_name> --grace-period=0 --force`.
-6. Summary of lessons learned: We should review access to the Kubernetes API server from administrative terminals and make sure to set up alert from the Grafana dashboards. Admission controllers should be configured to disallow unknown images to be used to create containers.
-
+6. Summary of lessons learned: We should review the policy governing the access to the Kubernetes API server and make sure to set up alerts from the Grafana dashboards. Admission controllers should be configured to disallow unknown images to be used to create containers.

@@ -26,4 +26,11 @@ could reach it), the service could be vulnerable to attacks that use this securi
 12.Elevation of Privilege:  privilege can be abused by using the --privileged flag, affecting kube-apiserver.
 
 Docker-bench Run Results and Analysis
-From the failed findings, select and document 3 findings from the Docker-bench results that you want to harden based on the 5 attack surface areas you identified in Step 1. At least 1 of the 3 hardened findings should be different from the ones mentioned in the exercise (i.e. 5.10, 5.14, and 5.22).
+From the failed findings, select and document 3 findings from the Docker-bench results that you want to harden based on the 5 attack 
+surface areas you identified in Step 1. At least 1 of the 3 hardened findings should be different from the ones mentioned in the exercise (i.e. 5.10, 5.14, and 5.22).
+The screenshot at "submissions/suse_docker_environment_after_daemon_audit_trust.jpg" shows that I have removed 15 attack surfaces, including
+
+4.5 Ensure Content trust for Docker is Enabled (Automated) -which counters repudiation at docker registry,
+5.15 Ensure that the host's process namespace is not shared (Automated) -which defends "Elevation of Privilege" at host, 
+1.1.6 Ensure auditing is configured for Docker files and directories - /etc/docker (Automated) - which enables detecting spoofing at docker client.  
+
